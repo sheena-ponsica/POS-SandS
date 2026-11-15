@@ -1,0 +1,6 @@
+{
+  "name": "Sheena & Shelo's Business POS",
+  "description": "POS Dashboard and Financial Transaction Management System with independent wallet accounting, expense tracking, and daily/monthly financial reports.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

@@ -1,0 +1,1091 @@
+# Project Prompt: Sheena & Shelo's Business – POS Dashboard & Financial Transaction Management System
+
+## 1. Project Overview
+
+Develop a modern, responsive, and easy-to-use Point of Sale (POS) Dashboard and Business Transaction Management System for **Sheena & Shelo's Business**.
+
+The goal is to replace the current manual Google Sheets-based tracking system with a centralized application that automatically records transactions, calculates sales and service earnings, monitors individual cash and e-wallet balances, tracks expenses, and generates accurate daily and monthly financial reports.
+
+The business provides the following services:
+
+- All Networks Mobile Loading
+- GCash Cash-in / Cash-out
+- Maya Cash-in / Cash-out
+- TV Cable Loading
+- Printing and Photocopying
+- Layouting and Graphic Designing
+- Resume Making
+- ID Picture Editing
+- Other Extra Services
+
+The application is intended for a small neighborhood service business. Prioritize:
+
+- Fast transaction recording.
+- Accurate financial calculations.
+- Independent wallet balance tracking.
+- Easy expense and cash flow management.
+- Reliable transaction history.
+- Simple daily and monthly reporting.
+- An intuitive and responsive interface.
+
+**Core Objective: Every service, payment, expense, and money movement must be recorded and traceable. No transaction should be forgotten, duplicated, or incorrectly assigned to another wallet.**
+
+---
+
+# 2. IMPORTANT: Review the Existing Project Before Making Changes
+
+Before implementing new functionality or modifying existing features, inspect the current codebase.
+
+Do not immediately rebuild the application or replace its existing architecture.
+
+First, review:
+
+1. Existing database structure and relationships.
+2. Current transaction recording functionality.
+3. Existing wallet and balance calculations.
+4. How payments are assigned to financial accounts.
+5. How expenses and transfers are recorded.
+6. Dashboard summary calculations.
+7. Existing reports and transaction history.
+8. Current UI components and navigation.
+
+Identify any existing problems, especially:
+
+- Wallet balances being combined incorrectly.
+- Transactions affecting multiple wallets unintentionally.
+- Duplicate balance deductions or additions.
+- Transfers being counted as sales or expenses.
+- Incorrect earnings calculations.
+- Dashboard figures not matching actual transaction records.
+- Historical transactions being modified or recalculated incorrectly.
+
+### Implementation Approach
+
+Before modifying existing functionality:
+
+- Explain the problems identified in the current implementation.
+- Propose the necessary database, backend, and frontend changes.
+- Identify which existing features will be affected.
+- Explain how historical transaction records will be preserved.
+
+After reviewing and proposing the changes, implement the improvements while preserving the existing UI, architecture, and working features wherever possible.
+
+Do not unnecessarily recreate existing components or duplicate functionality.
+
+---
+
+# 3. Dashboard Overview
+
+Create a dashboard that provides a real-time overview of the business's financial performance.
+
+## Dashboard Summary Cards
+
+Display:
+
+- Total Sales Today
+- Total Sales This Month
+- Total Earnings This Month
+- Total Expenses This Month
+- Net Earnings
+- Total Unpaid Transactions
+- Physical Cash Balance
+- GCash Balance
+- Maya Balance
+- MariBank Balance
+- Total Recorded Balance
+
+### Important Dashboard Calculation Rules
+
+Each financial figure must come from actual database records.
+
+**Sales This Month**
+- Total customer sales from completed transactions.
+- Exclude internal wallet transfers.
+- Exclude unpaid amounts from collected-money calculations.
+- Do not count wallet replenishments as sales.
+
+**Earnings This Month**
+- Actual service fees and profit margins earned from completed services.
+- For loading, earnings are the difference between the customer's payment and actual loading cost.
+- For cash-in/cash-out, only the service fee is business earnings.
+- For printing and extra services, use the appropriate service revenue minus applicable direct costs.
+
+**Expenses This Month**
+- Actual recorded business expenses.
+- Exclude internal transfers between wallets.
+
+**Net Earnings**
+- Total recognized business earnings minus applicable business expenses.
+
+**Individual Wallet Balances**
+- Physical Cash: Physical Cash transactions only.
+- GCash: GCash transactions only.
+- Maya: Maya transactions only.
+- MariBank: MariBank transactions only.
+
+**Total Recorded Balance**
+- Sum of the current balances of all individual wallets.
+- This is a summary figure only.
+- It must not replace or modify the individual wallet balances.
+
+## Sales Breakdown
+
+Display sales and earnings by service category.
+
+| Category | Included Services |
+|---|---|
+| Loading | Mobile loading and TV cable loading |
+| Cash-in / Cash-out | GCash and Maya services |
+| Printing / Photocopy | Printing, photocopying, and document services |
+| Extra Services | Layouting, graphic design, resume making, and other custom services |
+
+Include charts showing:
+
+- Sales distribution by service category.
+- Earnings distribution by service category.
+- Daily and monthly sales trends.
+
+## Recent Transactions
+
+Display:
+
+- Transaction ID
+- Customer Name
+- Service Category
+- Description
+- Amount
+- Service Fee / Earnings
+- Assigned Wallet
+- Payment Method
+- Date and Time
+- Payment Status
+
+Clicking a transaction should display its complete details, including associated financial movements.
+
+---
+
+# 4. Transaction Management
+
+Create a centralized transaction management module.
+
+Users must be able to record transactions quickly without navigating through multiple spreadsheets.
+
+Every transaction must have a clearly defined service category, payment method, and financial account assignment.
+
+## A. Loading Transactions
+
+Support all-network mobile loading and TV cable loading.
+
+Fields:
+
+- Customer Name
+- Network / Provider (Globe, Smart, DITO, TNT, TM, GOMO, etc.)
+- Load Product / Description
+- Customer Payment Amount
+- Actual Load Cost
+- Service Fee / Profit
+- Payment Method
+- Assigned Wallet
+- Transaction Date and Time
+- Payment Status
+
+Automatically calculate:
+
+**Loading Earnings = Customer Payment Amount - Actual Load Cost**
+
+Allow users to:
+
+- Select frequently used loading products.
+- Enter custom loading products.
+- Configure product prices and actual costs.
+- View loading transaction history.
+
+The wallet assigned to the actual payment must be the only wallet affected by the payment.
+
+## B. GCash / Maya Cash-in and Cash-out
+
+Support GCash and Maya cash-in/cash-out services.
+
+Fields:
+
+- Customer Name
+- Transaction Type (Cash-in / Cash-out)
+- Wallet Provider (GCash / Maya)
+- Transaction Amount
+- Service Fee
+- Total Amount Collected or Disbursed
+- Payment Method / Settlement Account
+- Assigned Wallet
+- Transaction Date and Time
+- Payment Status
+
+### Financial Logic
+
+Cash-in:
+- The customer's cash-in amount increases the applicable provider wallet balance.
+- The corresponding physical cash received is recorded in Physical Cash.
+- Service fee is recorded separately as business earnings.
+- Only the appropriate financial movements are recorded.
+
+Cash-out:
+- The provider wallet balance decreases by the cash-out amount.
+- Physical Cash decreases by the amount released to the customer.
+- The service fee is recorded separately as business earnings.
+- Only the appropriate financial movements are recorded.
+
+**Important:** Cash-in/cash-out services may involve two different accounts because money is exchanged between the business and the customer. These movements must be explicitly recorded as one linked service transaction, not as duplicated sales or income.
+
+Do not automatically apply these rules to unrelated wallets.
+
+The actual source and destination accounts must be determined by the transaction type and confirmed payment details.
+
+## C. Printing and Photocopy Services
+
+Fields:
+
+- Customer Name
+- Service Description
+- Number of Copies / Pages (optional)
+- Price per Copy (optional)
+- Total Amount
+- Direct Material Cost (optional)
+- Net Earnings
+- Payment Method
+- Assigned Wallet
+- Transaction Date and Time
+- Payment Status
+
+Examples:
+
+- Photocopy
+- Document Printing
+- Colored Printing
+- Black and White Printing
+- 1x1 ID Picture
+- 2x2 ID Picture
+
+Allow users to create custom printing services and configure their pricing.
+
+## D. Extra Services
+
+Support customizable services, including:
+
+- Graphic Designing
+- Layouting
+- Resume Making
+- ID Picture Editing
+- Document Formatting
+- Other Custom Services
+
+Fields:
+
+- Customer Name
+- Service Name
+- Description / Remarks
+- Amount Charged
+- Actual Expenses (optional)
+- Net Earnings
+- Payment Method
+- Assigned Wallet
+- Transaction Date and Time
+- Payment Status
+
+Allow users to add, edit, and deactivate custom service types without modifying the application code.
+
+---
+
+# 5. INDEPENDENT WALLET MANAGEMENT AND ACCOUNTING
+
+This is one of the most important requirements of the entire system.
+
+**Each wallet must function as an independent financial account with its own balance, transaction history, inflows, outflows, and adjustments.**
+
+Never combine the individual wallet transaction records into one shared ledger.
+
+## A. Individual Wallet Accounts
+
+Create the following financial accounts:
+
+1. Physical Cash
+2. GCash
+3. Maya
+4. MariBank
+
+Allow additional accounts to be configured in the future.
+
+Each wallet must maintain:
+
+- Opening Balance
+- Current Balance
+- Total Money Received (Inflow)
+- Total Money Released / Spent (Outflow)
+- Total Transfers In
+- Total Transfers Out
+- Balance Adjustments
+- Transaction History
+- Last Updated Date and Time
+
+## B. Wallet Isolation Rules
+
+Every transaction must be assigned to its actual financial account.
+
+Examples:
+
+| Transaction | Wallet Affected |
+|---|---|
+| Customer pays in cash | Physical Cash |
+| Customer pays through GCash | GCash |
+| Customer pays through Maya | Maya |
+| Customer pays through MariBank | MariBank |
+| GCash cash-in service | Relevant GCash and settlement accounts |
+| Maya cash-out service | Relevant Maya and settlement accounts |
+| MariBank withdrawal | MariBank and explicitly selected destination account |
+
+Rules:
+
+1. GCash transactions must not automatically affect Maya.
+2. Maya transactions must not automatically affect GCash.
+3. MariBank transactions must not automatically affect Physical Cash.
+4. Cash transactions must not automatically affect any e-wallet.
+5. A wallet must only be affected by explicitly recorded financial movements.
+6. Do not automatically distribute transaction amounts across multiple wallets.
+7. Do not duplicate a transaction across different wallet histories.
+8. Updating one wallet must never unintentionally change another wallet's balance.
+
+A service transaction can have multiple explicitly defined financial movements when money genuinely moves between accounts. However, each movement must be traceable to its source transaction.
+
+## C. Wallet-to-Wallet Transfers
+
+Create a separate Wallet Transfer feature.
+
+Example:
+
+Transfer ₱500 from GCash to Maya.
+
+Expected results:
+
+- GCash decreases by ₱500.
+- Maya increases by ₱500.
+- Physical Cash remains unchanged.
+- MariBank remains unchanged.
+- No sales are recorded.
+- No earnings are recorded.
+- No expenses are recorded.
+
+Record each transfer as one linked transaction containing:
+
+- Transfer ID
+- Source Wallet
+- Destination Wallet
+- Transfer Amount
+- Transfer Date and Time
+- Description / Remarks
+- Transfer Status
+
+Create two corresponding ledger entries:
+
+- Outflow from the source wallet.
+- Inflow to the destination wallet.
+
+Both entries must reference the same transfer ID.
+
+Do not allow transfers between the same wallet.
+
+Do not apply the balance changes twice if a transfer is edited, retried, or processed again.
+
+## D. Wallet Balance Adjustments
+
+Allow users to manually adjust wallet balances.
+
+Fields:
+
+- Wallet
+- Adjustment Type (Increase / Decrease)
+- Adjustment Amount
+- Reason
+- Date and Time
+
+Every adjustment must create an auditable financial record.
+
+Never silently overwrite an existing wallet balance.
+
+## E. Wallet Transaction History
+
+Each wallet must have its own dedicated history page or filter.
+
+For example:
+
+GCash History:
+- GCash customer payments.
+- GCash cash-in/cash-out movements.
+- Transfers into GCash.
+- Transfers out of GCash.
+- GCash adjustments.
+
+Maya History:
+- Maya customer payments.
+- Maya cash-in/cash-out movements.
+- Transfers into Maya.
+- Transfers out of Maya.
+- Maya adjustments.
+
+Apply the same logic to Physical Cash and MariBank.
+
+Every wallet history must display:
+
+- Date and Time
+- Reference ID
+- Transaction Description
+- Transaction Type
+- Money In
+- Money Out
+- Running Balance
+- Related Transaction ID
+
+The running balance must be calculated using that wallet's own ledger entries.
+
+---
+
+# 6. Payment and Transaction Status
+
+Every transaction must have a payment status:
+
+- Paid
+- Unpaid
+- Partially Paid (optional)
+
+Features:
+
+- Allow users to update unpaid transactions when payment is received.
+- Support partial payments if enabled.
+- Display outstanding balances.
+- Filter transactions by payment status.
+- Record payment collection dates.
+- Maintain a history of payment status changes.
+
+### Important Rules
+
+- Unpaid transactions must not affect actual collected wallet balances.
+- Only the amount actually received should increase the selected wallet.
+- When an unpaid transaction is settled, record the actual payment against the selected wallet.
+- Do not create duplicate financial movements when changing a payment status.
+- If a transaction is partially paid, only the collected amount should be reflected in wallet balances.
+
+Payment status changes must be traceable and auditable.
+
+---
+
+# 7. Expenses and Business Money Movement
+
+Create a dedicated expense and financial movement module.
+
+Fields:
+
+- Expense Description
+- Expense Category
+- Amount
+- Payment Source / Wallet
+- Date and Time
+- Remarks
+
+Examples:
+
+- Loading inventory purchases
+- Bond paper
+- Printer ink
+- Printing materials
+- Business supplies
+- Other operational expenses
+
+Support:
+
+- Business expenses.
+- Cash withdrawals and deposits.
+- Wallet transfers.
+- Loading inventory replenishment.
+- Refunds.
+- Balance corrections.
+
+### Financial Rules
+
+1. Every expense must be assigned to the wallet from which the money was actually paid.
+2. Cash expenses affect Physical Cash only.
+3. GCash expenses affect GCash only.
+4. Maya expenses affect Maya only.
+5. MariBank expenses affect MariBank only.
+6. Internal transfers must not be counted as expenses.
+7. Inventory replenishment must not automatically be treated as customer sales.
+8. Refunds must reference the original transaction whenever possible.
+9. Balance corrections must be recorded as adjustments, not ordinary expenses.
+
+Distinguish actual expenses, inventory purchases, refunds, and internal transfers to maintain accurate profit calculations.
+
+---
+
+# 8. Daily and Monthly Financial Reports
+
+Generate reports using actual transaction and ledger records.
+
+## A. Daily Sales Report
+
+Display:
+
+- Total Loading Sales
+- Total Cash-in / Cash-out Service Fees
+- Total Printing Sales
+- Total Extra Services Sales
+- Total Gross Sales
+- Total Earnings
+- Total Expenses
+- Net Earnings
+- Unpaid Transactions
+
+## B. Monthly Sales Report
+
+Allow users to select a month and year.
+
+Display:
+
+| Month | Sales | Earnings | Expenses | Net Earnings | Refund Obligations | Remaining |
+|---|---:|---:|---:|---:|---:|---:|
+| September | | | | | | |
+| October | | | | | | |
+| November | | | | | | |
+
+Include configurable refund categories such as:
+
+- Maribank Refund
+- Spay Refund
+- Other Refunds
+
+The refund categories must be configurable.
+
+Include:
+
+- Monthly sales by service category.
+- Monthly service fee earnings.
+- Monthly expenses.
+- Individual wallet balances.
+- Monthly cash flow.
+- Outstanding customer payments.
+- Refund obligations.
+
+## C. Wallet Financial Reports
+
+Generate separate reports for:
+
+- Physical Cash
+- GCash
+- Maya
+- MariBank
+
+Each report must show:
+
+- Opening Balance
+- Total Inflows
+- Total Outflows
+- Transfers In
+- Transfers Out
+- Adjustments
+- Closing Balance
+
+**Important:** The combined wallet balance is a summary of individual account balances, not an additional financial transaction.
+
+## D. Export Reports
+
+Support:
+
+- Excel (.xlsx)
+- CSV
+- PDF
+
+Allow filtering by:
+
+- Date range
+- Service category
+- Wallet
+- Payment status
+- Payment method
+- Transaction type
+
+---
+
+# 9. Transaction History and Search
+
+Create a searchable transaction history.
+
+Features:
+
+- Search by customer name.
+- Search by transaction description.
+- Search by transaction ID.
+- Filter by service category.
+- Filter by payment status.
+- Filter by payment method.
+- Filter by assigned wallet.
+- Filter by date or date range.
+- View complete transaction details.
+- Edit transaction details.
+- Delete or void transactions with confirmation.
+
+### Audit and Data Integrity
+
+Editing or voiding transactions must not silently corrupt financial records.
+
+- Preserve historical transaction information.
+- Record who made the changes.
+- Record the original and updated values.
+- Record the reason for corrections when appropriate.
+- Reverse or correct associated ledger entries safely.
+- Never silently delete financial history.
+
+For transactions that have already affected wallet balances, use a proper reversal or adjustment process instead of simply deleting their financial movements.
+
+---
+
+# 10. Quick Transaction Entry
+
+Create a prominent **Add Transaction** button.
+
+The goal is to make transaction recording faster and easier than using Google Sheets.
+
+Workflow:
+
+1. Click Add Transaction.
+2. Select a service category.
+3. Display only the fields relevant to that service.
+4. Enter the customer and transaction details.
+5. Select the actual payment method and wallet.
+6. Review automatically calculated amounts.
+7. Confirm the transaction.
+8. Save the transaction and its corresponding financial movements.
+
+Requirements:
+
+- Automatically generate unique transaction IDs.
+- Automatically record date and time.
+- Provide useful default values.
+- Allow custom transaction descriptions.
+- Minimize unnecessary fields.
+- Prevent accidental duplicate submissions.
+- Show clear success and error messages.
+- Update dashboard figures and wallet balances after successful recording.
+
+All related financial records must be saved together using appropriate database transactions to prevent incomplete or inconsistent records.
+
+---
+
+# 11. Services and Pricing Management
+
+Create a module for managing frequently used services and products.
+
+Allow users to:
+
+- Add services.
+- Edit service details.
+- Configure prices.
+- Configure actual costs.
+- Create loading products.
+- Configure printing prices.
+- Add custom service categories.
+- Activate or deactivate services.
+
+Changes to service pricing must not automatically modify historical transaction amounts.
+
+Each transaction must preserve the actual price and cost recorded at the time it was completed.
+
+---
+
+# 12. User Interface and Design
+
+Build a clean, modern, professional POS dashboard.
+
+Suggested design:
+
+- Modern sidebar navigation.
+- White or light-gray dashboard background.
+- Green accents for successful transactions and positive balances.
+- Red indicators for expenses, unpaid transactions, and negative balances.
+- Organized data tables.
+- Simple transaction forms.
+- Responsive layouts for desktop, tablet, and mobile.
+
+### Suggested Navigation
+
+1. Dashboard
+2. Transactions
+3. Add Transaction
+4. Services & Pricing
+5. Wallet Management
+6. Wallet Transfers
+7. Expenses
+8. Reports
+9. Settings
+
+### Wallet Management Interface
+
+Display separate wallet cards for:
+
+- Physical Cash
+- GCash
+- Maya
+- MariBank
+
+Each card should display its own:
+
+- Current Balance
+- Total Inflows
+- Total Outflows
+- Recent Transactions
+
+Clicking a wallet should open its dedicated transaction history.
+
+The Total Recorded Balance should appear as a separate summary, not as a replacement for individual wallet balances.
+
+Prioritize usability and readability over unnecessary animations or complicated visual effects.
+
+---
+
+# 13. Technical Requirements and Database Architecture
+
+Use a maintainable and scalable architecture.
+
+Suggested stack:
+
+- Frontend: React + TypeScript
+- Styling: Tailwind CSS
+- Backend: PHP or Node.js
+- Database: MySQL
+- Charts: Recharts
+- PDF Export: jsPDF or equivalent
+- Excel Export: SheetJS or equivalent
+
+If the existing project already uses a different stack, preserve the existing architecture.
+
+### Suggested Database Structure
+
+Organize the database around related financial records.
+
+Suggested entities:
+
+**1. wallets**
+- id
+- wallet_name
+- wallet_type
+- opening_balance
+- current_balance (optional cached value)
+- status
+- created_at
+- updated_at
+
+**2. transactions**
+- id
+- transaction_number
+- customer_name
+- service_category
+- service_type
+- description
+- total_amount
+- actual_cost
+- service_fee
+- earnings
+- payment_status
+- transaction_date
+- created_at
+- updated_at
+
+**3. transaction_payments**
+- id
+- transaction_id
+- wallet_id
+- amount_paid
+- payment_method
+- payment_date
+- created_at
+
+**4. wallet_ledger**
+- id
+- wallet_id
+- reference_type
+- reference_id
+- transaction_type
+- amount_in
+- amount_out
+- description
+- running_balance (optional cached value)
+- created_at
+
+**5. wallet_transfers**
+- id
+- source_wallet_id
+- destination_wallet_id
+- amount
+- description
+- transfer_date
+- status
+- created_at
+
+**6. expenses**
+- id
+- description
+- category
+- amount
+- wallet_id
+- expense_date
+- remarks
+- created_at
+
+**7. balance_adjustments**
+- id
+- wallet_id
+- adjustment_type
+- amount
+- reason
+- adjustment_date
+- created_at
+
+**8. services**
+- id
+- service_name
+- category
+- default_price
+- actual_cost
+- status
+- created_at
+- updated_at
+
+**9. transaction_audit_logs**
+- id
+- transaction_id
+- action
+- old_values
+- new_values
+- reason
+- created_at
+
+The schema is a suggested structure. Review the existing database before introducing new tables or changing existing relationships.
+
+### Database and Backend Rules
+
+- Use proper foreign key relationships.
+- Use decimal types such as DECIMAL(12,2) for monetary values.
+- Never use floating-point arithmetic for financial calculations.
+- Use database transactions for operations that create multiple related records.
+- Prevent duplicate financial movements using unique references and idempotency controls.
+- Ensure wallet ledger entries are traceable to their source records.
+- Use appropriate indexes for transaction dates, wallet IDs, and reference IDs.
+- Protect financial operations against concurrent updates.
+- Implement secure validation and error handling.
+- Maintain reliable backup and recovery options.
+
+### Wallet Balance Calculation
+
+The authoritative wallet balance should be derived from the wallet's own financial ledger.
+
+Conceptually:
+
+**Current Wallet Balance = Opening Balance + Total Inflows - Total Outflows**
+
+Transfers and other movements must be included in the appropriate wallet's inflow or outflow.
+
+A cached balance may be used for performance, but it must remain consistent with the underlying ledger.
+
+The system must support reconciliation between the displayed balance and the actual ledger entries.
+
+---
+
+# 14. Critical Financial Accounting Rules
+
+Financial accuracy is more important than visual appearance.
+
+The following definitions and rules must be followed throughout the application.
+
+### Gross Sales
+Total recognized customer sales from completed services, based on the defined service accounting rules.
+
+### Business Earnings
+Actual service fees and profit margins earned from providing services.
+
+### Expenses
+Actual business costs and operational expenses.
+
+### Net Earnings
+Business earnings minus applicable expenses.
+
+### Wallet Balance
+The actual available balance of one specific financial account.
+
+### Total Recorded Balance
+The sum of all individual wallet balances.
+
+### Mandatory Rules
+
+1. Each wallet must maintain an independent ledger.
+2. Every financial movement must belong to its actual wallet.
+3. A transaction must not unintentionally affect unrelated wallets.
+4. Wallet transfers must not count as sales, income, or expenses.
+5. Wallet replenishments must not count as customer sales.
+6. Cash-in/cash-out transaction amounts must not be treated entirely as business profit.
+7. Only service fees and actual margins count as earnings.
+8. Unpaid amounts must not be included in collected wallet balances.
+9. Partial payments must only reflect the amounts actually received.
+10. Avoid duplicate wallet inflows and outflows.
+11. Historical financial records must remain traceable.
+12. Editing or reversing a transaction must correctly account for its previous financial movements.
+13. The dashboard must calculate figures from actual records, not hardcoded values.
+14. All monetary values must use Philippine Peso (₱).
+15. Every financial movement must have a reference to its originating transaction, expense, transfer, or adjustment.
+
+---
+
+# 15. Testing and Validation Requirements
+
+Before considering the system complete, test the financial logic using realistic scenarios.
+
+### Test Scenario 1: Independent Wallet Payments
+
+Initial balances:
+
+- Physical Cash: ₱1,000
+- GCash: ₱2,000
+- Maya: ₱1,500
+- MariBank: ₱3,000
+
+Record a ₱100 printing transaction paid through GCash.
+
+Expected balances:
+
+- Physical Cash: ₱1,000
+- GCash: ₱2,100
+- Maya: ₱1,500
+- MariBank: ₱3,000
+
+Only GCash should increase.
+
+### Test Scenario 2: Wallet-to-Wallet Transfer
+
+Transfer ₱500 from GCash to Maya.
+
+Expected balances:
+
+- Physical Cash: ₱1,000
+- GCash: ₱1,600
+- Maya: ₱2,000
+- MariBank: ₱3,000
+
+No sales, earnings, or expenses should be generated.
+
+### Test Scenario 3: Cash Payment
+
+Record a ₱50 printing transaction paid in cash.
+
+Expected balances:
+
+- Physical Cash: ₱1,050
+- GCash: ₱1,600
+- Maya: ₱2,000
+- MariBank: ₱3,000
+
+Only Physical Cash should increase.
+
+### Test Scenario 4: Unpaid Transaction
+
+Record a ₱200 service transaction with an Unpaid status.
+
+Expected result:
+
+- The transaction appears in transaction history.
+- Outstanding payments increase by ₱200.
+- No wallet balance changes.
+- No collected cash is recorded.
+
+When the customer pays ₱200 through Maya:
+
+- Maya increases by ₱200.
+- The outstanding balance becomes zero.
+- The payment is recorded exactly once.
+
+### Test Scenario 5: Loading Profit
+
+Record a loading transaction:
+
+- Customer Payment: ₱100
+- Actual Loading Cost: ₱95
+- Payment Method: Cash
+
+Expected result:
+
+- Physical Cash increases by ₱100.
+- Loading Earnings: ₱5.
+- GCash, Maya, and MariBank remain unchanged.
+
+### Test Scenario 6: Expense
+
+Record a ₱100 business supply expense paid through MariBank.
+
+Expected result:
+
+- MariBank decreases by ₱100.
+- Other wallets remain unchanged.
+- Business expenses increase by ₱100.
+- No sales or earnings are generated.
+
+### Test Scenario 7: Duplicate Submission
+
+Attempt to submit the same transaction twice.
+
+Expected result:
+
+- Only one transaction is recorded.
+- Only one set of financial movements is created.
+- Wallet balances are not updated twice.
+
+### Test Scenario 8: Transaction Correction
+
+Edit or void an existing transaction that has already affected a wallet.
+
+Expected result:
+
+- Original financial movements remain traceable.
+- Appropriate reversal or correction entries are recorded.
+- Balances are recalculated correctly.
+- Unrelated wallets remain unchanged.
+
+---
+
+# 16. Expected Final Result
+
+The finished application should completely replace the current manual Google Sheets workflow.
+
+The business owner should be able to:
+
+- Record customer transactions in seconds.
+- Record every service provided.
+- Automatically calculate sales and service earnings.
+- Monitor Physical Cash, GCash, Maya, and MariBank independently.
+- Track wallet-to-wallet transfers.
+- View individual wallet transaction histories.
+- Track unpaid and partially paid transactions.
+- Record expenses and refunds.
+- Monitor daily and monthly business performance.
+- Generate downloadable financial reports.
+- Review and trace every financial movement.
+
+## Final Development Priorities
+
+1. Accurate transaction recording.
+2. Independent wallet accounting and balance tracking.
+3. Correct sales and earnings calculations.
+4. Accurate payment and settlement handling.
+5. Expense, refund, and transfer management.
+6. Reliable transaction history and audit logs.
+7. Daily and monthly financial reporting.
+8. Clean, responsive, and easy-to-use POS dashboard.
+
+**FINAL REQUIREMENT: Build this as a fully functional business transaction and financial management system, not just a dashboard displaying static numbers.**
+
+Every displayed figure, chart, report, and wallet balance must be connected to actual database records.
+
+Most importantly, each wallet must operate independently. The dashboard may aggregate wallet balances for reporting purposes, but individual wallet transactions and balances must never be mixed or unintentionally modified.
+
+Preserve existing functionality, validate all financial calculations, and prioritize data integrity before adding visual enhancements.
