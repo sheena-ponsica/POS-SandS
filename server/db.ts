@@ -380,9 +380,20 @@ declare global {
   var _posSqliteDb: any | undefined;
 }
 
+export function getPostgresConnectionString(): string | undefined {
+  return (
+    process.env.DATABASE_URL?.trim() ||
+    process.env.POSTGRES_URL?.trim() ||
+    process.env.POSTGRES_PRISMA_URL?.trim() ||
+    process.env.POSTGRES_URL_NON_POOLING?.trim() ||
+    process.env.NEON_DATABASE_URL?.trim() ||
+    process.env.SUPABASE_DB_URL?.trim() ||
+    undefined
+  );
+}
+
 export function getActiveDialect(): DbDialect {
-  const url = process.env.DATABASE_URL?.trim();
-  return url ? 'postgres' : 'sqlite';
+  return getPostgresConnectionString() ? 'postgres' : 'sqlite';
 }
 
 async function getPgPool(): Promise<PgPoolType> {
@@ -396,7 +407,7 @@ async function getPgPool(): Promise<PgPoolType> {
       types.setTypeParser(20, (val: string) => parseInt(val, 10));
     }
 
-    const connectionString = process.env.DATABASE_URL!.trim();
+    const connectionString = getPostgresConnectionString()!;
     const isLocal =
       connectionString.includes('localhost') ||
       connectionString.includes('127.0.0.1') ||
@@ -418,6 +429,11 @@ async function getPgPool(): Promise<PgPoolType> {
 }
 
 async function getSqliteDb(): Promise<any> {
+  if (process.env.VERCEL) {
+    throw new Error(
+      'Database not configured: please add DATABASE_URL (your Neon or Supabase PostgreSQL connection string) in Vercel Project Settings -> Environment Variables, then redeploy.'
+    );
+  }
   if (!globalThis._posSqliteDb) {
     const mod = await import('better-sqlite3');
     const Database = mod.default;
